@@ -1,0 +1,50 @@
+# python
+__pycache__/
+__pypackages__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# macos
+.DS_Store
+
+# linux
+*~
+
+# ide
+.vscode/
+.idea/
+
+# local
+.trash/
+back/
+temp/
+todo/
+trash/
+
+**/*.json
+**/*.jsonl
+**/*.py
+temp-*/
+data-*/
+data/
