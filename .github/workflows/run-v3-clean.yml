@@ -1,0 +1,33 @@
+name: RUN Clean
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  schedule:
+    - cron: "8 8 1/3 * *"
+
+jobs:
+  process:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      SRC_NAME: db-src
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout src repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.SRC_NAME }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.SRC_NAME }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+
+      - name: Run Clean
+        run: |
+          pushd ${{ env.SRC_NAME }} && 
+          bash scripts2/run-clean.sh haijiaolu run-train3 ${{ secrets.GH_TOKEN }}
+          popd

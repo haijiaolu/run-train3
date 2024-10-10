@@ -1,0 +1,97 @@
+name: RUN V3b
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  schedule:
+    # exp * 2; rnk * 2
+    - cron: "3 3 * * *"
+    # - cron: "7 7 * * *"
+    - cron: "1 11 * * *" # rnk
+    # - cron: "4 14 * * *"
+    - cron: "7 17 * * *"
+    - cron: "0 20 * * *" # rnk
+
+jobs:
+  process:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      SRC_NAME: db-src
+      OUT_NAME: db-out-we
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout src repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.SRC_NAME }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.SRC_NAME }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+
+      - name: Checkout out repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.OUT_NAME }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.OUT_NAME }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: Set up committer
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Run script exp-A1
+        if: github.event.schedule == '3 3 * * *'
+        run: |
+          pushd ${{ env.SRC_NAME }} && 
+          bash scripts2/run-weekly-exp.sh ${{ env.OUT_NAME }} a1 &&
+          popd
+
+      - name: Run script exp-B1
+        if: github.event.schedule == '7 17 * * *'
+        run: |
+          pushd ${{ env.SRC_NAME }} && 
+          bash scripts2/run-weekly-exp.sh ${{ env.OUT_NAME }} b1 &&
+          popd
+
+      # - name: Run script exp-A2
+      #   if: github.event.schedule == '4 14 * * *'
+      #   run: |
+      #     pushd ${{ env.SRC_NAME }} && 
+      #     bash scripts2/run-weekly-exp.sh ${{ env.OUT_NAME }} a2 &&
+      #     popd
+
+      # - name: Run script exp-B2
+      #   if: github.event.schedule == '7 7 * * *'
+      #   run: |
+      #     pushd ${{ env.SRC_NAME }} && 
+      #     bash scripts2/run-weekly-exp.sh ${{ env.OUT_NAME }} b2 &&
+      #     popd
+
+      - name: Run script rnk-A
+        if: github.event.schedule == '1 11 * * *'
+        run: |
+          pushd ${{ env.SRC_NAME }} && 
+          bash scripts2/run-weekly-rnk.sh ${{ env.OUT_NAME }} a &&
+          popd
+
+      - name: Run script rnk-B
+        if: github.event.schedule == '0 20 * * *'
+        run: |
+          pushd ${{ env.SRC_NAME }} && 
+          bash scripts2/run-weekly-rnk.sh ${{ env.OUT_NAME }} b &&
+          popd
+
+      - name: Commit and push
+        run: bash push-repo.sh ${{ env.OUT_NAME }}
