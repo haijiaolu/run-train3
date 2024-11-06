@@ -1,0 +1,73 @@
+name: RUN Page1-Ext
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  schedule:
+    - cron: '0/20 * * * *'
+    # - cron: '0 4 * * 1'
+
+jobs:
+  process:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      SRC_NAME: db-src
+      DATA_NAME: db-out-mg
+      OUT_NAME: db-out-pg1-ext
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout src repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.SRC_NAME }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.SRC_NAME }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+
+      - name: Checkout out repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.OUT_NAME }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.OUT_NAME }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+      - name: Checkout data repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.DATA_NAME }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.DATA_NAME }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: Set up committer
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      # - name: Run update
+      #   if: github.event.schedule == '0 4 * * 1'
+      #   run: |
+      #     pushd ${{ env.SRC_NAME }} && 
+      #     bash scripts2/update-sync.sh ${{ env.OUT_NAME }} ${{ env.DATA_NAME }} &&
+      #     popd
+
+      - name: Run script
+        if: github.event.schedule == '0/20 * * * *'
+        run: |
+          pushd ${{ env.SRC_NAME }} && 
+          bash scripts2/run-details.sh ${{ env.OUT_NAME }} v1 70 &&
+          popd
+
+      - name: Commit and push
+        run: bash push-repo.sh ${{ env.OUT_NAME }}
