@@ -16,6 +16,7 @@ jobs:
       SRC_NAME: db-src
       DATA_NAME1: db-out-da
       DATA_NAME2: db-out-we
+      DATA_NAME3: db-out-pg1
       OUT_NAME: db-out-mg
 
     steps:
@@ -54,6 +55,14 @@ jobs:
           path: ${{ env.DATA_NAME2 }}
           fetch-depth: 1
           ref: ${{ github.ref }}
+      - name: Checkout data repo
+        uses: actions/checkout@v4
+        with:
+          repository: haijiaolu/${{ env.DATA_NAME3 }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: ${{ env.DATA_NAME3 }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
 
       - name: Set up Python 3
         uses: actions/setup-python@v5
@@ -68,7 +77,7 @@ jobs:
         # if: github.event.schedule == '0 20 * * 1'
         run: |
           pushd ${{ env.SRC_NAME }} && 
-          bash scripts2/update-extract.sh ${{ env.OUT_NAME }} ${{ env.DATA_NAME1 }},${{ env.DATA_NAME2 }} &&
+          bash scripts2/update-extract.sh ${{ env.OUT_NAME }} ${{ env.DATA_NAME1 }},${{ env.DATA_NAME2 }},${{ env.DATA_NAME3 }} &&
           popd
 
       - name: Commit and push
