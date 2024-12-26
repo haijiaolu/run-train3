@@ -1,9 +1,9 @@
 name: RUN PageExt
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   schedule:
     - cron: '0/10 * * * *'
 
@@ -58,7 +58,7 @@ jobs:
         if: github.event.schedule == '0/10 * * * *'
         run: |
           pushd ${{ env.SRC_NAME }} && 
-          bash scripts2/run-details.sh ${{ env.OUT_NAME }} v3 100 &&
+          bash scripts2/run-details.sh ${{ env.OUT_NAME }} v3 50 &&
           popd
 
       - name: Commit and push
