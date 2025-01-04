@@ -5,7 +5,7 @@ on:
   #   branches:
   #     - main
   schedule:
-    - cron: '0/15 * * * *'
+    - cron: '0/30 * * * *'
     - cron: '0 4,12 * * 1'
 
 jobs:
@@ -63,10 +63,10 @@ jobs:
           popd
 
       - name: Run script
-        if: github.event.schedule == '0/15 * * * *'
+        if: github.event.schedule == '0/30 * * * *'
         run: |
           pushd ${{ env.SRC_NAME }} && 
-          bash scripts2/run-details.sh ${{ env.OUT_NAME }} v2 150 &&
+          bash scripts2/run-details.sh ${{ env.OUT_NAME }} v2 50 &&
           popd
 
       - name: Commit and push
